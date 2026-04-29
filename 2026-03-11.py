@@ -8,7 +8,17 @@ player = {
   "gold": 50,
   "damage": 5,
   "potions": [],
-  "weapons": []
+  "weapons": ["Fist"]
+}
+
+#Dictionary for the prices of items
+prices = {
+  "Sword": 100,
+  "Knife": 40, 
+  "Stick": 15,
+  "Club": 60,
+  "Health": 15,
+  "Armour": 10
 }
 
 #Dictionary for damage output of weapons
@@ -16,7 +26,8 @@ weapons = {
   "Sword": 20,
   "Knife": 10, 
   "Stick": 7,
-  "Club": 15
+  "Club": 15,
+  "Fist": 5,
 }
 
 enemies = [
@@ -25,6 +36,8 @@ enemies = [
   {"name": "Alien", "health": 60, "damage": 20, "gold": 40},
   {"name": "Skeleton", "health": 20, "damage": 7, "gold": 10}
 ]
+
+potions = ["Health", "Armour"]
 battle_counter=0
 
 #Handles potion drinking
@@ -64,13 +77,22 @@ def attack_enemy(enemy):
   else:  
     print("These are the weapons that you have available:")
     print(player["weapons"])
-    #User can input a weapon or "f" for fists (loop if not either of these choices)
-    weapon_choice=input("Which potion would you like to use? (Or enter 'f' for fists)\n> ")
-    while (weapon_choice not in player["weapons"]) or (weapon_choice != "q"):
-      print("Invalid weapon")
+    #User can input a weapon or "f" for fists (loop if not either of these choices
+    while True:
       weapon_choice=input("Which weapon would you like to use?\n> ")
-    if weapon_choice=="f":
-  #TODO - Finish weapon handling
+      if (weapon_choice in player["weapons"]) or (weapon_choice == "q"):
+        break
+      print("Invalid choice")
+    if weapon_choice == "q":
+      print("You have skipped this turn!")
+      return
+    if weapon_choice in weapons:
+      damage_output=weapons[weapon_choice]
+      enemy["health"]-=damage_output
+    print(f"The damage done to {enemy} is {damage_output}!")
+    print(f"Enemy Stats:\n")
+    for key, value in enemy.items():
+      print(f"{key}: {value}")
 
 
 # Fighting enemy:
@@ -78,6 +100,7 @@ def attack_enemy(enemy):
 # - Have a loop where the player than drink a potion/fight/run away
 # - Enemy attacks the player
 def fight_enemy():
+  global battle_counter
   battle_counter += 1
   enemy = random.choice(enemies).copy()
   print(f" --- Battle {battle_counter}--- \n")
@@ -100,8 +123,16 @@ def fight_enemy():
       attack_enemy(enemy)
     elif choice=="3":
       return
-    # - If enemy is less than 0, you won
-      
+  #If player's health is 0, exit the game
+  if player["health"] <= 0:
+    print("You have lost!\n Player health = 0")
+    quit()
+  #Else if enemies's health less than 0, take their gold
+  elif enemy["health"]<=0:
+    gold_taken= enemy["gold"]
+    player["gold"]+=gold_taken
+    enemy["gold"]=0
+    print(f"Enemy had been defeated!\n You have taken {gold_taken} gold from them!")
 
       
         
@@ -109,9 +140,7 @@ def fight_enemy():
         
         
           
-          
-        
-
+      
 
     #TODO - Finish the code
 
@@ -138,6 +167,21 @@ def view_stats():
 
 
 def shop():
+  #Display all the weapons and potions for sale (and their prices) (press q for quit)
+  print(f"Shop Prices:\n{prices}")
+  player_choice=input("Enter the item you would like to buy:")
+  #If they buy anything, add it to the appropriate array and subtract the gold
+  #Add to potions if
+  if player_choice in potions:
+    player["potions"].append(player_choice)
+    player["gold"]-=prices[player_choice]
+  #Add to weapons if
+
+  #Quit option
+
+    
+
+  #Ask them if they want to enter again
   pass
   
 def boss_fight():
